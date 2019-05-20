@@ -2,8 +2,6 @@
 set -e
 apt-get update && apt-get install -y mingw-w64 mingw-w64-tools  \
   default-jdk nsis libsaxonb-java curl
-=======
->>>>>>> Refactoring:mingw:simplify toolchain
 
 mkdir win32
 pushd win32
