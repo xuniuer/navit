@@ -359,8 +359,11 @@ static int bookmarks_store_bookmarks_to_file(struct bookmarks *this_,  int limit
         }
         limit--;
 
-        this_->bookmarks_list=g_list_next(this_->bookmarks_list);
-    }
+		this_->bookmarks_list=g_list_next(this_->bookmarks_list);
+	}
+#ifdef FlushFileBuffers
+	FlushFileBuffers(f)
+#endif FlushFileBuffers
 
     fclose(f);
 
@@ -372,7 +375,9 @@ static int bookmarks_store_bookmarks_to_file(struct bookmarks *this_,  int limit
 	}
 	
 	unlink(this_->bookmark_file);
+#ifdef _POSIX
 	sync();
+#endif _POSIX
 	result=(rename(this_->working_file,this_->bookmark_file)==0);
 	if (!result) 
 	{
