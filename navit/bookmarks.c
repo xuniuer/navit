@@ -365,6 +365,10 @@ static int bookmarks_store_bookmarks_to_file(struct bookmarks *this_,  int limit
 	FlushFileBuffers(f)
 #endif FlushFileBuffers
 
+#ifdef FlushFileBuffers
+	FlushFileBuffers(f)
+#endif FlushFileBuffers
+
     fclose(f);
 
 	g_hash_table_destroy(dedup);
