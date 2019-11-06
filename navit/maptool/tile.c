@@ -71,7 +71,6 @@ static char** th_get_subtile( const struct tile_head* th, int idx ) {
     return (char**)subtile_ptr;
 }
 
-# if 1
 /**
  * @brief check if the given rectangle fit into any of the four sub tiles of
  * a given bbox.
