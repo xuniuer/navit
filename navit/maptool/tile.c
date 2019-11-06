@@ -71,68 +71,108 @@ static char** th_get_subtile( const struct tile_head* th, int idx ) {
     return (char**)subtile_ptr;
 }
 
+# if 1
+/**
+ * @brief check if the given rectangle fit into any of the four sub tiles of
+ * a given bbox.
+ *
+ * @param r - given rectangle
+ * @param bbox - tile bbox
+ * @param overlap - overlap sizte in percent
+ * @return tile number (a,b,c,d) or 0 if fits in none of them
+ */
+static char fits_sub_tile (struct rect * r, struct rect * bbox, int overlap) {
+    struct coord center;
+    int xo;
+    int yo;
+    /* calculate the new center point */
+    center.x = (bbox->l.x + bbox->h.x) / 2;
+    center.y = (bbox->l.y + bbox->h.y) / 2;
+    /* calculate the x overlap */
+    xo = (bbox->h.x - bbox->l.x) * overlap / 100;
+    /* calculate the y overlap */
+    yo = (bbox->h.y - bbox->l.y) * overlap / 100;
+
+    if (contains_bbox(bbox->l.x,bbox->l.y,center.x+xo,center.y+yo, r)) {
+        bbox->h.x = center.x;
+        bbox->h.y = center.y;
+        return 'd';
+    } else if (contains_bbox(center.x-xo,bbox->l.y,bbox->h.x,center.y+yo, r)) {
+        bbox->h.x=center.x;
+        bbox->l.y=center.y;
+        return 'c';
+    } else if (contains_bbox(bbox->l.x,center.y-yo,center.x+xo,bbox->h.y, r)) {
+        bbox->h.x = center.x;
+        bbox->l.y = center.y;
+        return 'b';
+    } else if (contains_bbox(center.x-xo,center.y-yo,bbox->h.x,bbox->h.y, r)) {
+        bbox->l.x=center.x;
+        bbox->l.y=center.y;
+        return 'a';
+    } else {
+        /* bbox unchanged, no match */
+        return 0;
+    }
+}
+
+/**
+ * @brief Calculate the tile address of a guiven map rectangle
+ *
+ * @param r - rectangle
+ * @param suffix - additional text to add to the tile address
+ * @param ret - buffer to write tile address into. Must be at least 15 + strlen(suffix) long
+ * @param max - smallest tile number to check rectangle against.
+ * @param overlap - allow the items within the tiles to overlap by %
+ * @param tr - returns the choosen tile size without overlaps.
+ *
+ * @returns number of tile depth
+ */
 int tile(struct rect *r, char *suffix, char *ret, int max, int overlap, struct rect *tr) {
-    int x0,x2,x4;
-    int y0,y2,y4;
-    int xo,yo;
-    int i;
-    struct rect rr=*r;
+    struct rect bbox;
+    struct rect rr;
+    int tile;
+    int match=0;
 
-    x0=world_bbox.l.x;
-    y0=world_bbox.l.y;
-    x4=world_bbox.h.x;
-    y4=world_bbox.h.y;
+    /* start with the world bbox */
+    bbox=world_bbox;
 
-    if(rr.l.x<x0)
-        rr.l.x=x0;
-    if(rr.h.x<x0)
-        rr.h.x=x0;
-    if(rr.l.y<y0)
-        rr.l.y=y0;
-    if(rr.h.y<y0)
-        rr.h.y=y0;
-    if(rr.l.x>x4)
-        rr.l.x=x4;
-    if(rr.h.x>x4)
-        rr.h.x=x4;
-    if(rr.l.y>y4)
-        rr.l.y=y4;
-    if(rr.h.y>y4)
-        rr.h.y=y4;
+    /* remember the rect we try to tile */
+    rr = *r;
 
-    for (i = 0 ; i < max ; i++) {
-        x2=(x0+x4)/2;
-        y2=(y0+y4)/2;
-        xo=(x4-x0)*overlap/100;
-        yo=(y4-y0)*overlap/100;
-        if (     contains_bbox(x0,y0,x2+xo,y2+yo,&rr)) {
-            strcat(ret,"d");
-            x4=x2+xo;
-            y4=y2+yo;
-        } else if (contains_bbox(x2-xo,y0,x4,y2+yo,&rr)) {
-            strcat(ret,"c");
-            x0=x2-xo;
-            y4=y2+yo;
-        } else if (contains_bbox(x0,y2-yo,x2+xo,y4,&rr)) {
-            strcat(ret,"b");
-            x4=x2+xo;
-            y0=y2-yo;
-        } else if (contains_bbox(x2-xo,y2-yo,x4,y4,&rr)) {
-            strcat(ret,"a");
-            x0=x2-xo;
-            y0=y2-yo;
-        } else
-            break;
+    /* there is no need to forcefully limit the rectangle. It will
+     * end up in tile 0 anyways in case it is too big */
+
+    /* init suffix string */
+    ret[0] = 0;
+
+    /* iterate through the tile levels as long as it fits in */
+    for(tile=0; (!match) && (tile < max); tile ++) {
+        char next_tile;
+
+        /* always check without overlap first */
+        next_tile = fits_sub_tile (&rr, &bbox, 0);
+        /* if we have overlap, re try with overlap */
+        if(overlap && next_tile == 0) {
+            next_tile = fits_sub_tile (&rr, &bbox, overlap);
+        }
+        /* did it fit? */
+        if(next_tile == 0) {
+            /* cannot move this deeper, doesn't fit in no subtile */
+            match = 1;
+        }
+        /* add tile to address */
+        ret[tile] = next_tile;
+        ret[tile +1] = 0;
+
     }
-    if (tr) {
-        tr->l.x=x0;
-        tr->l.y=y0;
-        tr->h.x=x4;
-        tr->h.y=y4;
+    /* return tile bbox (without overlap) if asked to */
+    if(tr) {
+        *tr = bbox;
     }
+    /* add suffix if any */
     if (suffix)
         strcat(ret,suffix);
-    return i;
+    return tile;
 }
 
 void tile_bbox(char *tile, struct rect *r, int overlap) {
@@ -146,21 +186,41 @@ void tile_bbox(char *tile, struct rect *r, int overlap) {
         yo=(r->h.y-r->l.y)*overlap/100;
         switch (*tile) {
         case 'a':
-            r->l.x=c.x-xo;
-            r->l.y=c.y-yo;
+            if(*(tile +1)) {
+                r->l.x=c.x;
+                r->l.y=c.y;
+            } else {
+                r->l.x=c.x-xo;
+                r->l.y=c.y-yo;
+            }
             break;
         case 'b':
-            r->h.x=c.x+xo;
-            r->l.y=c.y-yo;
+            if(*(tile +1)) {
+                r->h.x=c.x;
+                r->l.y=c.y;
+            } else {
+                r->h.x=c.x+xo;
+                r->l.y=c.y-yo;
+            }
             break;
         case 'c':
-            r->l.x=c.x-xo;
-            r->h.y=c.y+yo;
+            if(*(tile +1)) {
+                r->l.x=c.x;
+                r->h.y=c.y;
+            } else {
+                r->l.x=c.x-xo;
+                r->h.y=c.y+yo;
+            }
             break;
         case 'd':
-            r->h.x=c.x+xo;
-            r->h.y=c.y+yo;
-            break;
+            if(*(tile +1)) {
+                r->h.x=c.x;
+                r->h.y=c.y;
+            } else {
+                r->h.x=c.x+xo;
+                r->h.y=c.y+yo;
+                break;
+            }
         }
         tile++;
     }

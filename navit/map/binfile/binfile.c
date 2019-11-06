@@ -1407,41 +1407,58 @@ static struct map_rect_priv *map_rect_new_binfile_int(struct map_priv *map, stru
 }
 
 static void tile_bbox(char *tile, int len, struct coord_rect *r) {
+    int overlap = 1;
     struct coord c;
-    int overlap=1;
     int xo,yo;
     struct coord_rect world_bbox = {
         { WORLD_BOUNDINGBOX_MIN_X, WORLD_BOUNDINGBOX_MAX_Y}, /* left upper corner */
         { WORLD_BOUNDINGBOX_MAX_X, WORLD_BOUNDINGBOX_MIN_Y}, /* right lower corner */
     };
     *r=world_bbox;
-    while (len) {
+    while (*tile) {
         c.x=(r->lu.x+r->rl.x)/2;
         c.y=(r->lu.y+r->rl.y)/2;
         xo=(r->rl.x-r->lu.x)*overlap/100;
-        yo=(r->lu.y-r->rl.y)*overlap/100;
+        yo=(r->rl.y-r->lu.y)*overlap/100;
         switch (*tile) {
         case 'a':
-            r->lu.x=c.x-xo;
-            r->rl.y=c.y-yo;
+            if(*(tile +1)) {
+                r->lu.x=c.x;
+                r->lu.y=c.y;
+            } else {
+                r->lu.x=c.x-xo;
+                r->lu.y=c.y-yo;
+            }
             break;
         case 'b':
-            r->rl.x=c.x+xo;
-            r->rl.y=c.y-yo;
+            if(*(tile +1)) {
+                r->rl.x=c.x;
+                r->lu.y=c.y;
+            } else {
+                r->rl.x=c.x+xo;
+                r->lu.y=c.y-yo;
+            }
             break;
         case 'c':
-            r->lu.x=c.x-xo;
-            r->lu.y=c.y+yo;
+            if(*(tile +1)) {
+                r->lu.x=c.x;
+                r->rl.y=c.y;
+            } else {
+                r->lu.x=c.x-xo;
+                r->rl.y=c.y+yo;
+            }
             break;
         case 'd':
-            r->rl.x=c.x+xo;
-            r->lu.y=c.y+yo;
-            break;
-        default:
-            return;
+            if(*(tile +1)) {
+                r->rl.x=c.x;
+                r->rl.y=c.y;
+            } else {
+                r->rl.x=c.x+xo;
+                r->rl.y=c.y+yo;
+                break;
+            }
         }
         tile++;
-        len--;
     }
 }
 
