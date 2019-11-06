@@ -97,8 +97,8 @@ static char fits_sub_tile (struct rect * r, struct rect * bbox, int overlap) {
         bbox->h.y = center.y;
         return 'd';
     } else if (contains_bbox(center.x-xo,bbox->l.y,bbox->h.x,center.y+yo, r)) {
-        bbox->h.x=center.x;
-        bbox->l.y=center.y;
+        bbox->l.x=center.x;
+        bbox->h.y=center.y;
         return 'c';
     } else if (contains_bbox(bbox->l.x,center.y-yo,center.x+xo,bbox->h.y, r)) {
         bbox->h.x = center.x;
@@ -130,7 +130,6 @@ int tile(struct rect *r, char *suffix, char *ret, int max, int overlap, struct r
     struct rect bbox;
     struct rect rr;
     int tile;
-    int match=0;
 
     /* start with the world bbox */
     bbox=world_bbox;
@@ -145,7 +144,7 @@ int tile(struct rect *r, char *suffix, char *ret, int max, int overlap, struct r
     ret[0] = 0;
 
     /* iterate through the tile levels as long as it fits in */
-    for(tile=0; (!match) && (tile < max); tile ++) {
+    for(tile=0; tile < max; tile ++) {
         char next_tile;
 
         /* always check without overlap first */
@@ -157,12 +156,11 @@ int tile(struct rect *r, char *suffix, char *ret, int max, int overlap, struct r
         /* did it fit? */
         if(next_tile == 0) {
             /* cannot move this deeper, doesn't fit in no subtile */
-            match = 1;
+            break;
         }
         /* add tile to address */
         ret[tile] = next_tile;
         ret[tile +1] = 0;
-
     }
     /* return tile bbox (without overlap) if asked to */
     if(tr) {
