@@ -55,25 +55,25 @@ msgstr "第六个"
 
 #. TRANSLATORS: the following counts refer to roundabout exits
 msgid "zeroth exit"
-msgstr "第零个退出"
+msgstr "第零个出口"
 
 msgid "first exit"
-msgstr "第一个退出"
+msgstr "第一个出口"
 
 msgid "second exit"
-msgstr "第二个退出"
+msgstr "第二个出口"
 
 msgid "third exit"
-msgstr "第三个退出"
+msgstr "第三个出口"
 
 msgid "fourth exit"
-msgstr "第四个退出"
+msgstr "第四个出口"
 
 msgid "fifth exit"
-msgstr "第五个退出"
+msgstr "第五个出口"
 
 msgid "sixth exit"
-msgstr "第六个退出"
+msgstr "第六个出口"
 
 #, c-format
 msgid "%d feet"
