@@ -189,7 +189,7 @@ msgstr "当遇到路口的时候，请转弯"
 #. TRANSLATORS: the argument is the destination to follow
 #, c-format
 msgid "towards %s"
-msgstr ""
+msgstr "向%s"
 
 #, c-format
 msgid "Follow the road for the next %s"
@@ -201,10 +201,10 @@ msgstr "不久将进入环形交叉路口"
 #. TRANSLATORS: %s is the distance to the roundabout
 #, c-format
 msgid "Enter the roundabout %s"
-msgstr ""
+msgstr "进入%s环岛"
 
 msgid "then enter the roundabout"
-msgstr ""
+msgstr "然后进入环岛"
 
 #. TRANSLATORS: first arg. is the manieth exit, second arg. is the destination to follow
 #, c-format
@@ -223,28 +223,28 @@ msgstr "然后"
 #. TRANSLATORS: the arg. is the phrase 'onto ...'. Right merge, the stuff after | doesn't have to be included.
 #, c-format
 msgid "then merge%1$s|right"
-msgstr ""
+msgstr "然后并入%1$s|right"
 
 #. TRANSLATORS: the first arg. is distance, the second is the phrase 'onto ...'. Right merge, the stuff after | doesn't have to be included.
 #, c-format
 msgid "Merge %1$s%2$s|right"
-msgstr ""
+msgstr "并入 %1$s%2$s|right"
 
 #. TRANSLATORS: the arg. is the phrase 'onto ...'. Left merge, the stuff after | doesn't have to be included.
 #, c-format
 msgid "then merge%1$s|left"
-msgstr ""
+msgstr "然后并入%1$s|left"
 
 #. TRANSLATORS: the first arg. is distance, the second is the phrase 'onto ...'. Left merge, the stuff after | doesn't have to be included.
 #, c-format
 msgid "Merge %1$s%2$s|left"
-msgstr ""
+msgstr "并入 %1$s%2$s|left"
 
 msgid "on your left"
-msgstr ""
+msgstr "在你的左侧"
 
 msgid "on your right"
-msgstr ""
+msgstr "在你的右侧"
 
 #. TRANSLATORS: the first arg. is exit ref and/or name, the second is the direction of exit and the third is distance
 #, c-format
@@ -266,22 +266,22 @@ msgstr ""
 #. TRANSLATORS: the arg. is where to do the maneuver
 #, c-format
 msgid "then continue straight%1$s"
-msgstr ""
+msgstr "然后继续沿%1$s直行"
 
 #. TRANSLATORS: the first arg. is distance, the second is where to do the maneuver, the third is destination
 #, c-format
 msgid "Continue straight %1$s%2$s%3$s"
-msgstr ""
+msgstr "继续沿 %1$s%2$s%3$s 直行"
 
 #. TRANSLATORS: the arg. is where to do the maneuver
 #, c-format
 msgid "then keep right%1$s"
-msgstr ""
+msgstr "然后保持%1$s右侧"
 
 #. TRANSLATORS: the first arg. is distance, the second is where to do the maneuver, the third is destination
 #, c-format
 msgid "Keep right %1$s%2$s%3$s"
-msgstr ""
+msgstr "保持%1$s%2$s%3$s右侧"
 
 #. TRANSLATORS: the arg. is where to do the maneuver
 #, c-format
